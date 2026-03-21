@@ -6,6 +6,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "agents"))
 sys.path.insert(0, os.path.dirname(__file__))
+
 from agents.rainbow_atari import NoisyDuelingDistributionalNetwork, make_env
 
 gym.register_envs(ale_py)
@@ -26,7 +27,6 @@ model = NoisyDuelingDistributionalNetwork(env, n_atoms=51, v_min=-10, v_max=10).
     device
 )
 
-# Remplace par ton chemin exact
 model.load_state_dict(
     torch.load(
         "runs/BreakoutNoFrameskip-v4__rainbow_atari__1__1774130797/rainbow_atari.pth",
@@ -35,7 +35,6 @@ model.load_state_dict(
 )
 model.eval()
 
-# Joue 3 épisodes
 obs, _ = env.reset()
 episodes = 0
 while episodes < 3:
@@ -49,4 +48,3 @@ while episodes < 3:
         print(f"Épisode {episodes} terminé")
 
 env.close()
-print("Vidéo sauvegardée dans videos/eval/")
