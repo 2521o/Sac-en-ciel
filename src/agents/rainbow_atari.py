@@ -8,6 +8,9 @@ from collections import deque
 from dataclasses import dataclass
 
 import gymnasium as gym
+import ale_py
+
+gym.register_envs(ale_py)
 import numpy as np
 import torch
 import torch.nn as nn
@@ -58,7 +61,7 @@ class Args:
     """the learning rate of the optimizer"""
     num_envs: int = 1
     """the number of parallel game environments"""
-    buffer_size: int = 1000000
+    buffer_size: int = 100000
     """the replay memory buffer size"""
     gamma: float = 0.99
     """the discount factor gamma"""
@@ -110,8 +113,8 @@ def make_env(env_id, seed, idx, capture_video, run_name):
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, (84, 84))
-        env = gym.wrappers.GrayScaleObservation(env)
-        env = gym.wrappers.FrameStack(env, 4)
+        env = gym.wrappers.GrayscaleObservation(env)
+        env = gym.wrappers.FrameStackObservation(env, 4)
 
         env.action_space.seed(seed)
         return env
@@ -479,18 +482,16 @@ if __name__ == "__main__":
         # TRY NOT TO MODIFY: execute the game and log data.
         next_obs, rewards, terminations, truncations, infos = envs.step(actions)
 
-        if "final_info" in infos:
-            for info in infos["final_info"]:
-                if info and "episode" in info:
-                    print(
-                        f"global_step={global_step}, episodic_return={info['episode']['r']}"
-                    )
-                    writer.add_scalar(
-                        "charts/episodic_return", info["episode"]["r"], global_step
-                    )
-                    writer.add_scalar(
-                        "charts/episodic_length", info["episode"]["l"], global_step
-                    )
+        if "episode" in infos:
+            print(
+                f"global_step={global_step}, episodic_return={infos['episode']['r'][0]}"
+            )
+            writer.add_scalar(
+                "charts/episodic_return", infos["episode"]["r"][0], global_step
+            )
+            writer.add_scalar(
+                "charts/episodic_length", infos["episode"]["l"][0], global_step
+            )
 
         # TRY NOT TO MODIFY: save data to reply buffer; handle `final_observation`
         real_next_obs = next_obs.copy()
@@ -593,6 +594,10 @@ if __name__ == "__main__":
                     target_param.data.copy_(
                         args.tau * param.data + (1.0 - args.tau) * target_param.data
                     )
+
+    if args.save_model:
+        model_path = f"runs/{run_name}/{args.exp_name}.pth"
+        torch.save(q_network.state_dict(), model_path)
 
     envs.close()
     writer.close()
