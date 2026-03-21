@@ -15,6 +15,7 @@ dependencies = [
     "setuptools==69.5.1",
     "tensorboard==2.14.0",
     "numpy==1.26.4",
+    "moviepy>=2.2.1",
 ]
 
 [tool.uv]
