@@ -1,0 +1,7 @@
+runs/           
+videos/
+__pycache__/
+*.pyc
+.venv/          
+wandb/
+*.egg-info/
