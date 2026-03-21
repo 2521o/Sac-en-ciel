@@ -1,16 +1,47 @@
 # Sac-en-ciel
 A comparative RL project: Rainbow DQN vs. Discrete SAC on Atari Breakout.
 
-# Implementation 
-This project explores the performance gap between a custom Rainbow DQN (enhanced with $\lambda$-returns) and Discrete Soft Actor-Critic (SAC).
-The project leverages [CleanRL](https://docs.cleanrl.dev/)'s single-file implementation approach. It allows for direct modifications of the source code, specifically for injecting $\lambda$-return logic into the Rainbow agent.
+## Description
+This project explores the performance gap between a custom Rainbow DQN 
+(enhanced with λ-returns) and Discrete Soft Actor-Critic (SAC).
+It leverages [CleanRL](https://docs.cleanrl.dev/)'s single-file implementation 
+approach for direct source modification.
 
-# Installation
-Requirements : [uv](https://docs.astral.sh/uv/getting-started/installation/)
-```
+## Requirements
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- NVIDIA GPU with CUDA (recommended)
+
+## Installation
 ```bash
 git clone https://github.com/2521o/Sac-en-ciel
 cd Sac-en-ciel
-uv sync  
+uv sync
 ```
 
+## Usage
+
+### Rainbow DQN
+```bash
+uv run python src/agents/rainbow_atari.py \
+  --env-id BreakoutNoFrameskip-v4 \
+  --cuda \
+  --save-model \
+  --buffer-size 100000 \
+  --total-timesteps 1000000
+```
+
+### Discrete SAC
+```bash
+uv run python src/agents/sac_atari.py \
+  --env-id BreakoutNoFrameskip-v4 \
+  --cuda \
+  --save-model \
+  --total-timesteps 1000000
+```
+
+## Monitoring
+```bash
+source .venv/bin/activate
+tensorboard --logdir runs/
+```
+Then open http://localhost:6006
