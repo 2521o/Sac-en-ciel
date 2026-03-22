@@ -18,6 +18,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 import tyro
 from torch.utils.tensorboard import SummaryWriter
+import pynvml
+
+pynvml.nvmlInit()
+gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
 from cleanrl_utils.atari_wrappers import (
     ClipRewardEnv,
@@ -571,6 +575,19 @@ if __name__ == "__main__":
                 rb.update_priorities(data.indices, new_priorities)
 
                 if global_step % 100 == 0:
+                    temp = pynvml.nvmlDeviceGetTemperature(
+                        gpu_handle, pynvml.NVML_TEMPERATURE_GPU
+                    )
+                    writer.add_scalar("charts/gpu_temperature", temp, global_step)
+
+                    if temp > 82:
+                        print(
+                            f"\nTempérature critique : {temp}°C. Sauvegarde et arrêt."
+                        )
+                        if args.save_model:
+                            model_path = f"runs/{run_name}/emergency_save.pth"
+                            torch.save(q_network.state_dict(), model_path)
+                        break
                     writer.add_scalar("losses/td_loss", loss.item(), global_step)
                     q_values = (pred_dist * q_network.support).sum(dim=1)  # [B]
                     writer.add_scalar(
