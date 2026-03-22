@@ -381,7 +381,7 @@ if __name__ == "__main__":
                 mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
                 vram_used = mem_info.used / 1024**2
                 ram_percent = psutil.virtual_memory().percent
-                process_ram = psutil.Process(os.getpgid()).memory_info.rss / 1024**2
+                process_ram = psutil.Process(os.getpid()).memory_info().rss / 1024**2
                 writer.add_scalar("charts/gpu_temperature", temp, global_step)
                 writer.add_scalar("charts/vram_used_mib", vram_used, global_step)
                 writer.add_scalar("charts/ram_usage_percent", ram_percent, global_step)
