@@ -45,3 +45,18 @@ source .venv/bin/activate
 tensorboard --logdir runs/
 ```
 Then open http://localhost:6006
+
+## Pretrained models
+
+You can use pretrained models by running:
+```bash
+uv run python src/evaluate.py --agent rainbowDQN_1M.pth --episode 5
+```
+
+This will automatically record a video of the agent playing Breakout, stored in `videos/`.
+
+### Available agents
+
+| Agent | Flag | Training steps |
+|---|---|---|
+| Rainbow DQN | `--agent rainbowDQN_1M.pth` (default)| 1M |
