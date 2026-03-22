@@ -5,3 +5,4 @@ wandb/
 *.egg-info/
 runs/
 videos/
+monitor.py
