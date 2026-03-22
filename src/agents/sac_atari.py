@@ -51,6 +51,8 @@ class Args:
     """the id of the environment"""
     total_timesteps: int = 5000000
     """total timesteps of the experiments"""
+    save_model: bool = False
+    """save model"""
     buffer_size: int = int(1e5)
     """the replay memory buffer size"""  # smaller than in original paper but evaluation is done only for 100k steps anyway
     gamma: float = 0.99
@@ -379,6 +381,9 @@ if __name__ == "__main__":
                     writer.add_scalar(
                         "losses/alpha_loss", alpha_loss.item(), global_step
                     )
+    if args.save_model:
+        model_path = f"runs/{run_name}/{args.exp_name}.pth"
+        torch.save(actor.state_dict(), model_path)
 
     envs.close()
     writer.close()
