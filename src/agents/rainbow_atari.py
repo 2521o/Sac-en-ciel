@@ -22,7 +22,7 @@ import pynvml
 
 pynvml.nvmlInit()
 gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-
+import psutil
 from cleanrl_utils.atari_wrappers import (
     ClipRewardEnv,
     EpisodicLifeEnv,
@@ -579,7 +579,6 @@ if __name__ == "__main__":
                         gpu_handle, pynvml.NVML_TEMPERATURE_GPU
                     )
                     writer.add_scalar("charts/gpu_temperature", temp, global_step)
-
                     if temp > 82:
                         print(
                             f"\nTempérature critique : {temp}°C. Sauvegarde et arrêt."
@@ -588,6 +587,20 @@ if __name__ == "__main__":
                             model_path = f"runs/{run_name}/emergency_save.pth"
                             torch.save(q_network.state_dict(), model_path)
                         break
+                    # ram, vram monitoring
+                    mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
+                    vram_used = mem_info.used / 1024**2
+                    ram_percent = psutil.virtual_memory().percent
+                    process_ram = psutil.Process(os.getpgid()).memory_info.rss / 1024**2
+                    writer.add_scalar("charts/gpu_temperature", temp, global_step)
+                    writer.add_scalar("charts/vram_used_mib", vram_used, global_step)
+                    writer.add_scalar(
+                        "charts/ram_usage_percent", ram_percent, global_step
+                    )
+                    writer.add_scalar(
+                        "charts/process_ram_mib", process_ram, global_step
+                    )
+                    # agent stats
                     writer.add_scalar("losses/td_loss", loss.item(), global_step)
                     q_values = (pred_dist * q_network.support).sum(dim=1)  # [B]
                     writer.add_scalar(
