@@ -53,6 +53,8 @@ You can use pretrained models by running:
 uv run python src/evaluate.py --agent rainbowDQN_1M.pth --episode 5
 ```
 
+Note: An episode actually corresponds to one trial. To play entire Breakout games, your episode number must be a multiple of 5.
+
 This will automatically record a video of the agent playing Breakout, stored in `videos/`.
 
 ### Available agents
