@@ -50,7 +50,7 @@ Then open http://localhost:6006
 
 You can use pretrained models by running:
 ```bash
-uv run python src/evaluate.py --agent rainbowDQN_1M.pth --episode 5
+uv run python src/evaluate.py --agent RDQN_1M  --algo rainbow --episode 5
 ```
 
 Note: An episode actually corresponds to one trial. To play entire Breakout games, your episode number must be a multiple of 5.
@@ -61,4 +61,5 @@ This will automatically record a video of the agent playing Breakout, stored in 
 
 | Agent | Flag | Training steps |
 |---|---|---|
-| Rainbow DQN | `--agent rainbowDQN_1M.pth` (default)| 1M |
+| Rainbow DQN | `--agent RDQN_1M --algo rainbow` (default)| 1M |
+| Discrete SAC | `-- agent DSAC_1M --algo sac` | 1M |
