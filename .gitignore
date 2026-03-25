@@ -1,8 +1,6 @@
 __pycache__/
 *.pyc
 .venv/          
-wandb/
 *.egg-info/
 runs/
 videos/
-monitor.py
