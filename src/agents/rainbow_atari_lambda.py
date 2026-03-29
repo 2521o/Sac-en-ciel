@@ -87,6 +87,8 @@ class Args:
     """the frequency of training"""
     n_step: int = 3
     """the number of steps to look ahead for n-step Q learning"""
+    lambda_: float = 0.8
+    """the parameter lambda for lambda return"""
     prioritized_replay_alpha: float = 0.5
     """alpha parameter for prioritized replay buffer"""
     prioritized_replay_beta: float = 0.4
@@ -289,7 +291,16 @@ class MinSegmentTree:
 
 class PrioritizedReplayBuffer:
     def __init__(
-        self, capacity, obs_shape, device, n_step, gamma, alpha=0.6, beta=0.4, eps=1e-6
+        self,
+        capacity,
+        obs_shape,
+        device,
+        n_step,
+        gamma,
+        alpha=0.6,
+        beta=0.4,
+        eps=1e-6,
+        lam=0.9,
     ):
         self.capacity = capacity
         self.device = device
@@ -298,6 +309,7 @@ class PrioritizedReplayBuffer:
         self.alpha = alpha
         self.beta = beta
         self.eps = eps
+        self.lam = lam
 
         self.buffer_obs = np.zeros((capacity,) + obs_shape, dtype=np.uint8)
         self.buffer_next_obs = np.zeros((capacity,) + obs_shape, dtype=np.uint8)
@@ -315,18 +327,42 @@ class PrioritizedReplayBuffer:
         # For n-step returns
         self.n_step_buffer = deque(maxlen=n_step)
 
-    def _get_n_step_info(self):
-        reward = 0.0
+    def _get_n_step_info_lambda(self, lam=0.9):
+        """
+        Calcule le λ-return comme moyenne pondérée des n-step returns.
+        G_lam = (1-lam) * sum_{n=1}^{N-1} lam^{n-1} * G(n) + lam^{N-1} * G(N)
+        """
+        N = len(self.n_step_buffer)
+
+        # Calcule tous les G_n pour n = 1, ..., N
+        g_n = []
+        for n in range(1, N + 1):
+            reward = 0.0
+            done = False
+            for i in range(n):
+                reward += self.gamma**i * self.n_step_buffer[i][2]
+                if self.n_step_buffer[i][4]:
+                    done = True
+                    break
+            g_n.append((reward, self.n_step_buffer[n - 1][3], done))
+
+        # Moyenne pondérée par lambda
+        g_lambda = 0.0
         next_obs = self.n_step_buffer[-1][3]
         done = self.n_step_buffer[-1][4]
 
-        for i in range(len(self.n_step_buffer)):
-            reward += self.gamma**i * self.n_step_buffer[i][2]
-            if self.n_step_buffer[i][4]:
-                next_obs = self.n_step_buffer[i][3]
+        for n in range(N - 1):
+            weight = (1 - lam) * (lam**n)
+            g_lambda += weight * g_n[n][0]
+            if g_n[n][2]:  # épisode terminé
+                next_obs = g_n[n][1]
                 done = True
                 break
-        return reward, next_obs, done
+
+        # Dernier terme sans (1-lambda)
+        g_lambda += (lam ** (N - 1)) * g_n[-1][0]
+
+        return g_lambda, next_obs, done
 
     def add(self, obs, action, reward, next_obs, done):
         self.n_step_buffer.append((obs, action, reward, next_obs, done))
@@ -334,7 +370,7 @@ class PrioritizedReplayBuffer:
         if len(self.n_step_buffer) < self.n_step:
             return
 
-        reward, next_obs, done = self._get_n_step_info()
+        reward, next_obs, done = self._get_n_step_info_lambda(self.lam)
         obs = self.n_step_buffer[0][0]
         action = self.n_step_buffer[0][1]
 
@@ -451,6 +487,7 @@ if __name__ == "__main__":
         args.prioritized_replay_alpha,
         args.prioritized_replay_beta,
         args.prioritized_replay_eps,
+        lam=args.lambda_,
     )
 
     start_time = time.time()
