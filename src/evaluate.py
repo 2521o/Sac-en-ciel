@@ -18,15 +18,15 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("-a", "--agent", required=True)
 parser.add_argument("-e", "--episode", default=1, type=int)
-parser.add_argument("--algo", choices=["rainbow", "sac"], required=True)
 args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 agent_name = args.agent
+algo = agent_name.split(separator="_")
 run_name = f"{agent_name}_{args.episode}ep"
 
-if args.algo == "rainbow":
+if algo == "RDQN" or algo == "RDQN_lam":
     env = gym.vector.SyncVectorEnv(
         [
             make_env(
@@ -56,7 +56,7 @@ if args.algo == "rainbow":
             episodes += 1
             print(f"Épisode {episodes} terminé")
 
-elif args.algo == "sac":
+elif algo == "DSAC":
     env = gym.vector.SyncVectorEnv(
         [
             make_env(
