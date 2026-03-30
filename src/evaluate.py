@@ -26,7 +26,7 @@ agent_name = args.agent
 algo = agent_name.split(separator="_")
 run_name = f"{agent_name}_{args.episode}ep"
 
-if algo == "RDQN" or algo == "RDQN_lam":
+if algo == "RDQN" or algo == "RDQNLam":
     env = gym.vector.SyncVectorEnv(
         [
             make_env(
