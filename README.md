@@ -73,4 +73,4 @@ This will automatically record a video of the agent playing Breakout, stored in 
 |---|---|---|
 | RainbowDQN | `--agent RDQN_1M` | 1M |
 | RainbowDQNLam | `--agent RDQNLam_1M` | 1M |
-| Discrete SAC | `-- agent DSAC_1M` | 1M |
+| Discrete SAC | `--agent DSAC_1M` | 1M |
