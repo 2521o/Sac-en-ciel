@@ -37,7 +37,7 @@ uv run python src/agents/rainbow_atari_lambda.py \
   --cuda \
   --save-model \
   --total-timesteps 1000000 \
-  --lam 0.9 
+  --lambda_ 0.9 
 ```
 
 ### Discrete SAC
