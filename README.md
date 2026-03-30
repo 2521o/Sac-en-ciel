@@ -30,6 +30,16 @@ uv run python src/agents/rainbow_atari.py \
   --total-timesteps 1000000
 ```
 
+### Rainbow DQN w/ lambda return
+```bash
+uv run python src/agents/rainbow_atari_lambda.py \
+  --env-id BreakoutNoFrameskip-v4 \
+  --cuda \
+  --save-model \
+  --total-timesteps 1000000 \
+  --lam 0.9 
+```
+
 ### Discrete SAC
 ```bash
 uv run python src/agents/sac_atari.py \
