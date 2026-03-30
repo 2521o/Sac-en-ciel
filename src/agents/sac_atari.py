@@ -354,6 +354,11 @@ if __name__ == "__main__":
                     )
 
             if global_step % 100 == 0:
+                # Sauvegarde toutes les 1M steps
+                if global_step % 1000000 == 0 and global_step > 0:
+                    checkpoint_path = f"runs/{run_name}/checkpoint_{global_step}.pth"
+                    torch.save(actor.state_dict(), checkpoint_path)
+                    print(f"Checkpoint sauvegardé : {checkpoint_path}")
                 # Temperature monitoring
                 temp = pynvml.nvmlDeviceGetTemperature(
                     gpu_handle, pynvml.NVML_TEMPERATURE_GPU
