@@ -563,6 +563,12 @@ if __name__ == "__main__":
                 rb.update_priorities(data.indices, new_priorities)
 
                 if global_step % 100 == 0:
+                    if global_step % 1000000 == 0 and global_step > 0:
+                        checkpoint_path = (
+                            f"runs/{run_name}/checkpoint_{global_step}.pth"
+                        )
+                        torch.save(q_network.state_dict(), checkpoint_path)
+                        print(f"Checkpoint sauvegardé : {checkpoint_path}")
                     temp = pynvml.nvmlDeviceGetTemperature(
                         gpu_handle, pynvml.NVML_TEMPERATURE_GPU
                     )
