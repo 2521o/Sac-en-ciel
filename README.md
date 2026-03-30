@@ -61,5 +61,6 @@ This will automatically record a video of the agent playing Breakout, stored in 
 
 | Agent | Flag | Training steps |
 |---|---|---|
-| Rainbow DQN | `--agent RDQN_1M --algo rainbow` | 1M |
-| Discrete SAC | `-- agent DSAC_1M --algo sac` | 1M |
+| RainbowDQN | `--agent RDQN_1M` | 1M |
+| RainbowDQNLam | `--agent RDQNLam_1M` | 1M |
+| Discrete SAC | `-- agent DSAC_1M` | 1M |
