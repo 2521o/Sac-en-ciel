@@ -23,7 +23,8 @@ args = parser.parse_args()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 agent_name = args.agent
-algo = agent_name.split(separator="_")
+algo = agent_name.split("_")[0]
+print(algo)
 run_name = f"{agent_name}_{args.episode}ep"
 
 if algo == "RDQN" or algo == "RDQNLam":
